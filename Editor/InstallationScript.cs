@@ -9,6 +9,8 @@ namespace UnitySupport.XR
     public static class InstallationScript
     {
         private const string XRSettingsInstalledKey = "XRSETTINGS_INSTALLED";
+        private const string XRSettingsPackagePath = "Packages/com.unitysupport.xr/XR~";
+        private const string XRSettingsAssetsPath = "Assets/XR";
 
         private static string XRSettingsInstalledPath
         {
@@ -29,45 +31,67 @@ namespace UnitySupport.XR
         [InitializeOnLoadMethod]
         public static void Initialize()
         {
-            //if (XRSettingsInstalled)
-            //{
-            //    return;
-            //}
+            if (XRSettingsInstalled)
+            {
+                return;
+            }
 
-            //CopySettingsToAssets();
+            CopySettingsToAssets();
         }
 
         [MenuItem("Unity Support/Reset XR Settings")]
         public static void ResetSettings()
         {
-            // Todo: delete existing?
-
             CopySettingsToAssets();
         }
 
         public static void CopySettingsToAssets()
         {
-            // Todo: do copy
+            AssetDatabase.StartAssetEditing();
+
+            AssetDatabase.DeleteAsset(XRSettingsAssetsPath);
+
+            string sourcePath = Path.GetFullPath(XRSettingsPackagePath);
+            CopyDirectory(sourcePath, XRSettingsAssetsPath, true);
+
+            AssetDatabase.StopAssetEditing();
+
+            AssetDatabase.Refresh();
 
             File.WriteAllText(XRSettingsInstalledPath, XRSettingsInstalledKey);
         }
 
-        [MenuItem("Unity Support/Test")]
-        public static void Test()
+        private static void CopyDirectory(string sourceDir, string destinationDir, bool recursive)
         {
-            string absolutePath = Path.GetFullPath("Packages/com.unitysupport.xr");
+            // Get information about the source directory
+            var dir = new DirectoryInfo(sourceDir);
 
-            var exists = Directory.Exists(absolutePath);
+            // Check if the source directory exists
+            if (!dir.Exists)
+                throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
 
-            Debug.Log($"{exists}, {absolutePath}");
+            // Cache directories before we start copying
+            DirectoryInfo[] dirs = dir.GetDirectories();
 
-            absolutePath = Path.GetFullPath("Packages/com.unitysupport.xr/XR~");
+            // Create the destination directory
+            Directory.CreateDirectory(destinationDir);
 
-            exists = Directory.Exists(absolutePath);
+            // Get the files in the source directory and copy to the destination directory
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                string targetFilePath = Path.Combine(destinationDir, file.Name);
+                file.CopyTo(targetFilePath);
+            }
 
-            Debug.Log($"{exists}, {absolutePath}");
-
-            //AssetDatabase.Refresh();
+            // If recursive and copying subdirectories, recursively call this method
+            if (recursive)
+            {
+                foreach (DirectoryInfo subDir in dirs)
+                {
+                    string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
+                    CopyDirectory(subDir.FullName, newDestinationDir, true);
+                }
+            }
         }
     }
 }
