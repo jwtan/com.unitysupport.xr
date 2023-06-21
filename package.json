@@ -1,0 +1,17 @@
+{
+    "dependencies": {
+        "com.unity.xr.management": "4.3.3",
+        "com.unity.xr.openxr": "1.7.0"
+    },
+    "description": "Sample XR package created by UnitySupport",
+    "displayName": "UnitySupport XR",
+    "keywords": [
+        "unitysupport",
+        "support",
+        "xr",
+        "unitysupport xr"
+    ],
+    "name": "com.unitysupport.xr",
+    "unity": "2019.3",
+    "version": "1.0.0"
+}
