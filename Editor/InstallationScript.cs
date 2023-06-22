@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace UnitySupport.XR
+namespace UnitySupport.XR.Editor
 {
     public static class InstallationScript
     {
@@ -47,6 +47,8 @@ namespace UnitySupport.XR
 
         public static void CopySettingsToAssets()
         {
+			Debug.Log($"com.unitysupport.xr: Copying XR settings from package to Assets folder");
+			
             AssetDatabase.StartAssetEditing();
 
             AssetDatabase.DeleteAsset(XRSettingsAssetsPath);
